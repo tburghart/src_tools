@@ -23,10 +23,10 @@
 #
 # Author:     Ted Burghart
 # Version:    0.0.1
-# Revision:   0   2014-11-09T12:31:23Z
+# Revision:   1   2014-11-10T00:06:00Z
 #
 
-typeset  -r TraceOpt='set -x'
+typeset  -r TraceOpt='set +x'
 $TraceOpt
 
 #
@@ -86,7 +86,6 @@ handle_comment()
         typeset  -i rev
         let 'rev += 1'
         revdt="$(printf '%-3u %s' "$rev" "$DateTime")"
-        cp -p "$fpath" "prev.$fpath"
         cp "$fpath" "$TempFile"
         sed -E "s/$filt/\\1\\2$revdt\\6/" "$TempFile" > "$fpath"
         return $?
@@ -138,7 +137,6 @@ handle_erl_module()
     then
         typeset  -i rev
         let 'rev += 1'
-        cp -p "$fpath" "prev.$fpath"
         cp "$fpath" "$TempFile"
         sed -E "s/$ErlRevFilt/\\1$rev\\3$DateTime\\5/" "$TempFile" > "$fpath"
         return $?
