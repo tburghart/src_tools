@@ -1,0 +1,31 @@
+#
+# Ted's global Git attributes
+#
+# Revision: 0   2014-11-09T23:56:09Z
+#
+*               text=auto
+*.app.scr       text
+*.applescript   text
+*.c             text
+*.cc            text
+*.cfg           text
+*.conf          text
+*.config        text
+*.cpp           text
+*.cxx           text
+*.der           -text
+*.erl           text
+*.h             text
+*.hh            text
+*.hpp           text
+*.hrl           text
+*.hxx           text
+*.jpeg          -text
+*.jpg           -text
+*.pdf           -text
+*.pem           text
+*.png           -text
+*.sh            eol=lf
+*.tif           -text
+*.tiff          -text
+Makefile        text
