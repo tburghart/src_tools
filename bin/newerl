@@ -1,4 +1,23 @@
 #!/bin/ksh
+#
+# Copyright (c) 2014 T. R. Burghart.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# Author:     Ted Burghart
+# Version:    1
+# Revision:   2   2014-11-24T17:53:54Z
 
 typeset  -r OWNER='Basho Technologies, Inc.'
 typeset  -r AUTHOR='Ted Burghart'
@@ -56,10 +75,11 @@ do
         # probably more elaborate than needed, but I want 5
         # random digits to append to the include guard and
         # the shell's RANDOM is limited to 15 bits
-        typeset -i  randi="0x$(openssl rand -hex 3)"
-        while [[ $randi -lt 10000 ]]
+        typeset -i  randi=0
+        while true
         do
             randi="0x$(openssl rand -hex 3)"
+            [[ $randi -lt 100000 ]] || break
         done
         typeset -R5 rands="$randi"
         typeset -u  guard="${filename//./_}_included_$rands"
@@ -72,21 +92,25 @@ done
 exit
 
 ===== COPYRIGHT BEGIN =====
+%% -------------------------------------------------------------------
 %%
-%%  Copyright @@YEAR@@ @@OWNER@@
+%% Copyright (c) @@YEAR@@ @@OWNER@@
 %%
-%%  Licensed under the Apache License, Version 2.0 (the "License");
-%%  you may not use this file except in compliance with the License.
-%%  You may obtain a copy of the License at
+%% This file is provided to you under the Apache License,
+%% Version 2.0 (the "License"); you may not use this file
+%% except in compliance with the License.  You may obtain
+%% a copy of the License at
 %%
-%%      http://www.apache.org/licenses/LICENSE-2.0
+%%   http://www.apache.org/licenses/LICENSE-2.0
 %%
-%%  Unless required by applicable law or agreed to in writing, software
-%%  distributed under the License is distributed on an "AS IS" BASIS,
-%%  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-%%  See the License for the specific language governing permissions and
-%%  limitations under the License.
+%% Unless required by applicable law or agreed to in writing,
+%% software distributed under the License is distributed on an
+%% "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+%% KIND, either express or implied.  See the License for the
+%% specific language governing permissions and limitations
+%% under the License.
 %%
+%% -------------------------------------------------------------------
 ===== COPYRIGHT END =====
 
 ===== MODULE BEGIN =====
