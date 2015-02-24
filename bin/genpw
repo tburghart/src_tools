@@ -1,0 +1,134 @@
+#!/bin/ksh
+#
+# Copyright (c) 2014,2015 T. R. Burghart
+#
+# Permission to use, copy, modify, and/or distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+
+#
+# options:
+#   -c <count>  required - how many passwords to generate
+#   -l <length> required - length of each password
+#   -h <length> optional - generate lengths between -l and -h, inclusive
+#
+
+#
+# minimum password length
+#
+typeset -ir MINLEN=6
+
+#
+# default length if none is specified
+#
+typeset -ir DEFLEN=11
+
+#
+# At least one of each character class must be present per this many
+# characters of generated password length. Calculated as
+#   (number-of-classes * 2) + 1
+#
+typeset -ir CLASSBLKLEN=7
+
+# future use
+typeset  -r SPECIAL='!@#$%^&*?'
+typeset  -r EXTEND='()-={}~'
+
+usage()
+{
+cat >&2 <<EOF
+Usage: ${0##*/} [-l {length | minlength -h maxlength}] [-c count]
+  Writes <count> passwords of the specified length, or within the specified
+  length range, to standard output, one per line.
+  Each password contains a mixture of 7-bit ASCII uppercase and lowercase
+  letters and decimal digits, containing at least N of each character class,
+  where N is (<generated password length> / $CLASSBLKLEN), but never less than one.
+Defaults:
+  If <count> is not specified, it defaults to 1.
+  If <length> (or a length range) is not specified, it defaults to $DEFLEN.
+Constraints:
+  If <length|minlength> is less than $MINLEN, $MINLEN is used.
+  If <maxlength> is less than the effective <minlength>, <minlength> is used.
+    This is the same as not providing the -h option.
+  NO OPTION is provided to write output to a file, use redirection.
+EOF
+exit 1
+}
+
+typeset -i  count=1
+typeset -i  lolen=$DEFLEN
+typeset -i  hilen=0
+
+while getopts ':c:h:l:' OPT
+do
+    [[ "$OPT" == [chl] ]] || usage
+    if ! [[ "$OPTARG" =~ ^[0-9]+$ ]]
+    then
+        echo "Error: parameter '-$OPT' requires a decimal number." >&2
+        usage
+    fi
+    case "$OPT" in
+        c )
+            count="$OPTARG"
+            ;;
+        h )
+            hilen="$OPTARG"
+            ;;
+        l )
+            lolen="$OPTARG"
+            ;;
+        * )
+            usage
+            ;;
+    esac
+done
+
+[[ $lolen -ge $MINLEN ]] || lolen=$MINLEN
+[[ $hilen -gt $lolen ]] || hilen=0
+typeset  -r count lolen hilen
+
+typeset -i  range pwlen
+let 'range = (hilen > lolen) ? ((hilen - lolen) + 1) : 0'
+let 'pwlen = (((lolen + (range ? range : 1)) * 3) / 4)'
+typeset  -r range
+
+#set | egrep '^(lolen|hilen|range|pwlen)='
+
+typeset  -r genpw="/usr/bin/openssl rand -base64 $pwlen"
+
+let 'pwlen = lolen'
+typeset -i  minclass
+typeset     chrbuf
+typeset -i  index=0
+
+while [[ $index -lt $count ]]
+do
+    if [[ $range -gt 0 ]]
+    then
+        let 'pwlen = (lolen + (RANDOM % range))'
+    fi
+    typeset -L$pwlen cand="$($genpw)"
+
+    [[ "$cand" != */* && "$cand" != *+* ]] || continue
+
+    let 'minclass = ((pwlen < CLASSBLKLEN) ? 1 : (pwlen / CLASSBLKLEN))'
+    chrbuf="${cand//[^0-9]/}"
+    [[ ${#chrbuf} -ge $minclass ]] || continue
+    chrbuf="${cand//[^A-Z]/}"
+    [[ ${#chrbuf} -ge $minclass ]] || continue
+    chrbuf="${cand//[^a-z]/}"
+    [[ ${#chrbuf} -ge $minclass ]] || continue
+
+    echo "$cand"
+    let 'index += 1'
+    unset cand
+done
