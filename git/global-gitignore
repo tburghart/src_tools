@@ -1,8 +1,0 @@
-#
-# Ted's global Git ignores
-#
-# Revision: 0   2014-11-09T23:56:09Z
-#
-*~
-*.bak
-.DS_Store

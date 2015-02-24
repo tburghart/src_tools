@@ -1,9 +1,0 @@
-#
-# Local Git attributes
-# Everything in here is text
-#
-# Revision: 0   2014-11-09T23:56:09Z
-#
-
-*                   text filter=updaterev
-bin/update-rev.sh   text
