@@ -1,0 +1,21 @@
+#
+# Ted's global Git ignores
+#
+
+*.bak
+*.iml
+*.tmp
+*~
+.DS_Store
+.cproject
+.eunit
+.idea/
+.project
+.rebar
+.settings/
+build.*.txt
+env
+env.local
+install.*.txt
+notes.txt
+tmp
